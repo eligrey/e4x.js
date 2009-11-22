@@ -126,7 +126,7 @@
 				res = <></>;
 				nextNode = iter.iterateNext();
 				while (nextNode) {
-					res += nextNode.XML();
+					res += nextNode.xml();
 					nextNode = iter.iterateNext();
 				}
 				break;
