@@ -65,7 +65,7 @@
 				break;
 			case "comment":
 				node = this.toString();
-				return doc.createComment(node.substr(4, comment.length - 7));
+				return doc.createComment(node.substr(4, node.length - 7));
 				// equivalent to node.replace(/^<!--|-->$/g, "")
 				break;
 			case "processing-instruction":
