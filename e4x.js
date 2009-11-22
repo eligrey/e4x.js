@@ -5,7 +5,7 @@
  * e4x.js helps make XML objects and the DOM much more interchangeable. This library
  * implements the optional E4X features described in ECMA-357 2nd Edition Annex A. It
  * also implements Node.xml() and NodeList.xml() and extensions for XML.xpath() such
- * as numeric, string, and boolean types. Some pre-defined namespaces including
+ * as numeric, string, and boolean return types. Some pre-defined namespaces including
  * XHTML, XHTML2, MathML, SVG, XLink, XForms, XFrames, and XML Events are accessible
  * via XML.namespaces and use common prefixes.
  *
@@ -19,7 +19,11 @@
  *   See COPYING.md
  */
 
-/*global document, XML, Namespace, Node, NodeList, DOMParser, XMLSerializer, XPathResult*/
+/*global document, XML, XMLList, Namespace, Node, NodeList, DOMParser,
+  XMLSerializer, XPathResult*/
+
+/*jslint undef: true, nomen: true, eqeqeq: true, bitwise: true, regexp: true,
+  newcap: true, immed: true, maxerr: 1000, maxlen: 90 */
 
 (function () {
 	"use strict";
@@ -30,7 +34,7 @@
 	domParser     = new DOMParser(),
 	xmlSerializer = new XMLSerializer(),
 	xmlDoc        = domParser.parseFromString("<x/>", xmlMediaType),
-	piData        = /<\?[\w-]+|\?>/g,
+	piData        = /<\?[\w\-]+|\?>/g,
 	isXMLList     = function (xml) { // this is needed because XML inherits from XMLList
 		if (typeof xml !== "xml") {
 			return false;
@@ -59,28 +63,23 @@
 				).documentElement);
 				XML.prettyPrinting = prettyPrinting;
 				return node;
-				break;
 			case "text":
 				return doc.createTextNode(this.toString());
-				break;
 			case "comment":
 				node = this.toString();
 				return doc.createComment(node.substr(4, node.length - 7));
 				// equivalent to node.replace(/^<!--|-->$/g, "")
-				break;
 			case "processing-instruction":
 				return doc.adoptNode(xmlDoc.createProcessingInstruction(
 					this.localName(),
 					this.toString().replace(piData, "")
 				));
-				break;
 			case "attribute":
 				(node = doc.createAttributeNS(
 					this.name().uri || null,
 					this.localName()
 				)).nodeValue = this.toString();
 				return node;
-				break;
 		}
 	});
 	
@@ -99,8 +98,10 @@
 	
 	XML.prototype.function::xpath ||
 	(XML.prototype.function::xpath = function (xpathExp) {
+		var res;
+		
 		if (isXMLList(this)) {
-			var res = <></>;
+			res = new XMLList();
 			for (var i = 0, len = this.length(); i < len; i++) {
 				res += this[i].xpath(xpathExp);
 			}
@@ -123,7 +124,7 @@
 		switch (iter.resultType) {
 			case XPathResult.ORDERED_NODE_ITERATOR_TYPE:
 			case XPathResult.UNORDERED_NODE_ITERATOR_TYPE:
-				res = <></>;
+				res = new XMLList();
 				nextNode = iter.iterateNext();
 				while (nextNode) {
 					res += nextNode.xml();
@@ -168,7 +169,7 @@
 	
 	NodeList.prototype.xml ||
 	(NodeList.prototype.xml = function () {
-		var xmlList = <></>,
+		var xmlList = new XMLList(),
 		len = this.length,
 		i = 0;
 		for (; i < len; i++) {
