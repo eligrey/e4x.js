@@ -1,6 +1,6 @@
 /*
  * e4x.js
- * Version 0.1
+ * Version 0.1.1
  * 
  * e4x.js helps make XML objects and the DOM much more interchangeable. This library
  * implements the optional E4X features described in ECMA-357 2nd Edition Annex A. It
@@ -25,10 +25,11 @@
 /*jslint undef: true, nomen: true, eqeqeq: true, bitwise: true, regexp: true,
   newcap: true, immed: true, maxerr: 1000, maxlen: 90 */
 
-(function () {
+typeof XML !== "undefined" && (function (XML) { // XML param for minification
 	"use strict";
 	
 	var
+	proto         = XML.prototype,
 	doc           = document,
 	xmlMediaType  = "application/xml",
 	domParser     = new DOMParser(),
@@ -50,13 +51,13 @@
 		return true;
 	};
 	
-	XML.prototype.function::domNode ||
-	(XML.prototype.function::domNode = function () {
-		var prettyPrinting = XML.prettyPrinting,
-		node;
+	proto.function::domNode ||
+	(proto.function::domNode = function () {
+		var node;
 		
 		switch (this.nodeKind()) {
 			case "element":
+				var prettyPrinting = XML.prettyPrinting;
 				XML.prettyPrinting = false;
 				node = doc.adoptNode(domParser.parseFromString(
 					this.toXMLString(), xmlMediaType
@@ -83,27 +84,27 @@
 		}
 	});
 	
-	XML.prototype.function::domNodeList ||
-	(XML.prototype.function::domNodeList = function () {
+	proto.function::domNodeList ||
+	(proto.function::domNodeList = function () {
 		var fragment = doc.createDocumentFragment(),
-		len = this.length(),
-		i = 0;
+		i = this.length();
 		
-		for (; i < len; i++) {
+		while (i--) {
 			fragment.appendChild(this[i].domNode());
 		}
 		
 		return fragment.childNodes;
 	});
 	
-	XML.prototype.function::xpath ||
-	(XML.prototype.function::xpath = function (xpathExp) {
+	proto.function::xpath ||
+	(proto.function::xpath = function (xpathExp) {
 		var res;
 		
 		if (isXMLList(this)) {
 			res = new XMLList();
-			for (var i = 0, len = this.length(); i < len; i++) {
-				res += this[i].xpath(xpathExp);
+			var i = this.length();
+			while (i--) {
+				res = this[i].xpath(xpathExp) + res;
 			}
 			return res;
 		}
@@ -111,34 +112,33 @@
 		var prettyPrinting = XML.prettyPrinting;
 		XML.prettyPrinting = false;
 		var domDoc = domParser.parseFromString(this.toXMLString(), xmlMediaType),
-		iter = domDoc.evaluate(
+		xpr = domDoc.evaluate(
 			xpathExp,
 			domDoc.documentElement,
 			domDoc.createNSResolver(domDoc.documentElement),
 			XPathResult.ANY_TYPE,
 			null
-		),
-		nextNode;
+		);
 		XML.prettyPrinting = prettyPrinting;
 		
-		switch (iter.resultType) {
+		switch (xpr.resultType) {
 			case XPathResult.ORDERED_NODE_ITERATOR_TYPE:
 			case XPathResult.UNORDERED_NODE_ITERATOR_TYPE:
 				res = new XMLList();
-				nextNode = iter.iterateNext();
-				while (nextNode) {
-					res += nextNode.xml();
-					nextNode = iter.iterateNext();
+				var node;
+				
+				while (node = xpr.iterateNext()) {
+					res += node.xml();
 				}
 				break;
 			case XPathResult.NUMBER_TYPE:
-				res = iter.numberValue;
+				res = xpr.numberValue;
 				break;
 			case XPathResult.STRING_TYPE:
-				res = iter.stringValue;
+				res = xpr.stringValue;
 				break;
 			case XPathResult.BOOLEAN_TYPE:
-				res = iter.booleanValue;
+				res = xpr.booleanValue;
 				break;
 		}
 		
@@ -147,9 +147,6 @@
 	
 	XML.ignoreComments =
 	XML.ignoreProcessingInstructions = false;
-	if (typeof XML.preserveCDATA !== "undefined") {
-		XML.preserveCDATA = true; // https://bugzilla.mozilla.org/show_bug.cgi?id=389123
-	}
 	
 	XML.namespaces = {
 		XHTML     : new Namespace("xhtml", "http://www.w3.org/1999/xhtml"),
@@ -169,12 +166,12 @@
 	
 	NodeList.prototype.xml ||
 	(NodeList.prototype.xml = function () {
-		var xmlList = new XMLList(),
-		len = this.length,
-		i = 0;
-		for (; i < len; i++) {
-			xmlList += this.item(i).xml();
+		var res = new XMLList(),
+		i = this.length;
+		
+		while (i--) {
+			res = this.item(i).xml() + res;
 		}
-		return xmlList;
+		return res;
 	});
-}());
+}(XML));
