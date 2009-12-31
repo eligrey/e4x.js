@@ -69,17 +69,20 @@ typeof XML !== "undefined" && (function (XML) { // XML parameter for minificatio
 				}
 				
 				return node;
+			
 			case "text":
 				return xmlDoc.createTextNode(xml.toString());
+			
 			case "comment":
-				node = xml.toString();
-				return xmlDoc.createComment(node.substr(4, node.length - 7));
-				// equivalent to node.replace(/^<!--|-->$/g, "") for valid comments
+				return xmlDoc.createComment(xml.toString().slice(4, -3));
+				// equivalent to node.replace(/^<!--|-->$/g, "") for comments
+			
 			case "processing-instruction":
 				return xmlDoc.createProcessingInstruction(
 					xml.localName(),
 					xml.toString().replace(piWrapper, "")
 				);
+			
 			case "attribute":
 				(node = xmlDoc.createAttributeNS(
 					xml.name().uri || null,
