@@ -75,7 +75,6 @@ typeof XML !== "undefined" && (function (XML) { // XML parameter for minificatio
 			
 			case "comment":
 				return xmlDoc.createComment(xml.toString().slice(4, -3));
-				// equivalent to node.replace(/^<!--|-->$/g, "") for comments
 			
 			case "processing-instruction":
 				return xmlDoc.createProcessingInstruction(

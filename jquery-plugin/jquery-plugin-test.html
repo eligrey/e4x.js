@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>jQuery E4X DOM Plugin Test</title>
+<style type="text/css">
+h2 {
+	color: black;
+}
+.fail {
+	background-color: red;
+}
+.pass {
+	background-color: limegreen;
+}
+</style>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3/jquery.min.js"></script>
+<script type="application/javascript;e4x=1" src="jquery.e4x-dom.min.js"></script>
+</head>
+<body>
+<h1>jQuery E4X DOM Plugin Test</h1>
+<h2 id="xml2dom" class="fail"><em>XML → DOM</em> doesn't work.</h2>
+<h2 id="dom2xml" class="fail"><em>DOM → XML</em> doesn't work.</h2>
+<script type="application/javascript;e4x=1">
+$("#xml2dom").before( $(<h2 class="pass"><em>XML → DOM</em> works!</h2>) ).remove();
+$("#dom2xml").before( $( $(<h2 class="pass"><em>DOM → XML</em> works!</h2>).xml() ) ).remove();
+</script>
+</body>
+</html>
