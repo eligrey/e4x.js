@@ -30,7 +30,7 @@ typeof XML !== "undefined" && (function (XML) { // XML parameter for minificatio
 	domParser     = new DOMParser,
 	xmlSerializer = new XMLSerializer,
 	xmlDoc        = domParser.parseFromString("<x/>", xmlMediaType),
-	piWrapper     = /<\?[\w\-]+|\?>/g,
+	piName        = /^[\w\-]+\s*/,
 	
 	xmlToDomNode = function (xml) {
 		var node;
@@ -80,7 +80,7 @@ typeof XML !== "undefined" && (function (XML) { // XML parameter for minificatio
 			case "processing-instruction":
 				return xmlDoc.createProcessingInstruction(
 					xml.localName(),
-					xml.toString().replace(piWrapper, "")
+					xml.toString().slice(2, -2).replace(piName, "")
 				);
 			
 			case "attribute":
