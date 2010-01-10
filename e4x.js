@@ -1,17 +1,13 @@
 /*
  * e4x.js
- * Version 0.2
+ * Version 0.2.1
  * 
  * e4x.js implements the optional E4X features described in ECMA-357 2nd Edition Annex A.
  *
- * 2009-12-30
+ * 2010-01-10
  * 
  * By Elijah Grey, http://eligrey.com
- * 
- * Copyright (c) 2009 Elijah Grey
- *
- * License: GNU GPL v3 and the X11/MIT license
- *   See COPYING.md
+ * License: The X11/MIT license (see COPYING.md)
  */
 
 /*global document, XML, XMLList, Namespace, Node, NodeList, DOMParser,
@@ -116,9 +112,8 @@ typeof XML !== "undefined" && (function (XML) { // XML parameter for minificatio
 		var res = new XMLList;
 		
 		if (this.length() !== 1) {
-			var i = this.length();
-			while (i--) {
-				res = this[i].xpath(xpathExp) + res;
+			for (var i = 0, len = this.length(); i < len; i++) {
+				res += this[i].xpath(xpathExp);
 			}
 			return res;
 		}

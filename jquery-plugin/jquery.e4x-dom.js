@@ -1,7 +1,7 @@
 /*
  * jQuery E4X DOM Plugin
- * Version 0.1
- * 2009-12-31
+ * Version 0.1.1
+ * 2010-01-10
  * 
  * By Elijah Grey, http://eligrey.com
  * License: The X11/MIT license
@@ -116,10 +116,11 @@ typeof XMLSerializer !== "undefined" &&
 (function ($, xmlSerializer) {
 	$.fn.xml = function () {
 		var xml = new XMLList,
-		i = this.length;
+		    i   = 0,
+		    len = this.length;
 		
-		while (i--) {
-			xml = new XML(xmlSerializer.serializeToString(this[i])) + xml;
+		for (; i < len; i++) {
+			xml += new XML(xmlSerializer.serializeToString(this[i]));
 		}
 		
 		return xml;
