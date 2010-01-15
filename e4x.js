@@ -1,10 +1,10 @@
 /*
  * e4x.js
- * Version 0.2.1
+ * Version 0.2.2
  * 
  * e4x.js implements the optional E4X features described in ECMA-357 2nd Edition Annex A.
  *
- * 2010-01-10
+ * 2010-01-14
  * 
  * By Elijah Grey, http://eligrey.com
  * License: The X11/MIT license (see COPYING.md)
@@ -16,17 +16,44 @@
 /*jslint undef: true, nomen: true, eqeqeq: true, bitwise: true, regexp: true,
   newcap: true, immed: true, maxerr: 1000, maxlen: 90 */
 
-typeof XML !== "undefined" && (function (XML) { // XML parameter for minification
+typeof XML !== "undefined" &&
+typeof DOMParser !== "undefined" &&
+typeof XMLSerializer !== "undefined" &&
+(function (XML) { // XML parameter for minification
 	"use strict";
 	
 	var
-	proto         = XML.prototype,
-	doc           = document,
-	xmlMediaType  = "application/xml",
-	domParser     = new DOMParser,
-	xmlSerializer = new XMLSerializer,
-	xmlDoc        = domParser.parseFromString("<x/>", xmlMediaType),
-	piName        = /^[\w\-]+\s*/,
+	proto          = XML.prototype,
+	doc            = document,
+	xmlMediaType   = "application/xml",
+	domParser      = new DOMParser,
+	xmlSerializer  = new XMLSerializer,
+	createDocumentFrom = function (elem) {
+		// XXX: Figure out a way to create a document without DOMParser or implent an
+		//      XPath engine for E4X (which would have to be another whole library and be
+		//      slower than the native DOM's engine).
+		
+		var newDoc     = domParser.parseFromString(
+			"<" + elem.tagName + "/>", xmlMediaType
+		),
+		docEl          = newDoc.documentElement,
+		childNodes     = elem.childNodes,
+		children       = childNodes.length,
+		attributeNodes = elem.attributes,
+		i              = attributeNodes.length;
+		
+		while (i--) {
+			docEl.setAttributeNode(newDoc.adoptNode(attributeNodes.item(0)));
+		}
+		
+		for (i = 0; i < children; i++) {
+			docEl.appendChild(newDoc.adoptNode(childNodes[i]));
+		}
+		
+		return newDoc;
+	},
+	xmlDoc         = domParser.parseFromString("<x/>", xmlMediaType),
+	piName         = /^[\w\-]+\s*/,
 	
 	xmlToDomNode = function (xml) {
 		var node;
@@ -37,7 +64,7 @@ typeof XML !== "undefined" && (function (XML) { // XML parameter for minificatio
 				    children   = xml.children(),
 				    i, len;
 				node = xmlDoc.createElementNS(
-					xml.name().uri || null,
+					xml.namespace().uri || null,
 					xml.localName()
 				);
 				
@@ -49,7 +76,7 @@ typeof XML !== "undefined" && (function (XML) { // XML parameter for minificatio
 					for (; i < len; i++) {
 						attribute = attributes[i];
 						node.setAttributeNS(
-							attribute.name().uri || null,
+							attribute.namespace().uri || null,
 							attribute.localName(),
 							attribute.toString()
 						);
@@ -80,7 +107,7 @@ typeof XML !== "undefined" && (function (XML) { // XML parameter for minificatio
 			
 			case "attribute":
 				(node = xmlDoc.createAttributeNS(
-					xml.name().uri || null,
+					xml.namespace().uri || null,
 					xml.localName()
 				)).nodeValue = xml.toString();
 				return node;
@@ -118,10 +145,7 @@ typeof XML !== "undefined" && (function (XML) { // XML parameter for minificatio
 			return res;
 		}
 		
-		// XXX: Figure out a way to somehow construct a DOM document from a DOM element.
-		var prettyPrinting = XML.prettyPrinting;
-		XML.prettyPrinting = false;
-		var domDoc = domParser.parseFromString(this.toXMLString(), xmlMediaType),
+		var domDoc = createDocumentFrom(this.domNode()),
 		xpr = domDoc.evaluate(
 			xpathExp,
 			domDoc.documentElement,
@@ -129,7 +153,6 @@ typeof XML !== "undefined" && (function (XML) { // XML parameter for minificatio
 			XPathResult.ORDERED_NODE_ITERATOR_TYPE,
 			null
 		);
-		XML.prettyPrinting = prettyPrinting;
 		
 		var node;
 		
