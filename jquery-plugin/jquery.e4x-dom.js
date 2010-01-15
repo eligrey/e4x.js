@@ -1,7 +1,7 @@
 /*
  * jQuery E4X DOM Plugin
- * Version 0.1.1
- * 2010-01-10
+ * Version 0.1.2
+ * 2010-01-14
  * 
  * By Elijah Grey, http://eligrey.com
  * License: The X11/MIT license
@@ -12,17 +12,19 @@
 
 /*global jQuery, XML, XMLList, DOMParser, XMLSerializer, document*/
 
+if (typeof XML !== "undefined") {
+
 // Modifications that convert XML to DOM NodeLists when passing them to jQuery
-typeof XML !== "undefined" && typeof DOMParser !== "undefined" &&
+typeof DOMParser !== "undefined" &&
 (function ($) {
-	var Init = $.fn.init,
+	var Init = jQuery.fn.init,
 	doc      = document,
 	xmlDoc   = (new DOMParser).parseFromString("<x/>", "application/xml"),
 	piName   = /^[\w\-]+\s*/,
 	domNodeList;
 	
 	try {
-		// In case the type doesn't include ;e4x=1 and XML is defined and
+		// In case the script type doesn't include ;e4x=1 and XML is defined and
 		// a non-E4X-supporting browser somehow gets this far
 		domNodeList = eval("XML.prototype.function::domNodeList");
 	} catch (e) {
@@ -39,7 +41,7 @@ typeof XML !== "undefined" && typeof DOMParser !== "undefined" &&
 						children   = xml.children(),
 						i, len;
 					node = xmlDoc.createElementNS(
-						xml.name().uri || null,
+						xml.namespace().uri || null,
 						xml.localName()
 					);
 				
@@ -51,7 +53,7 @@ typeof XML !== "undefined" && typeof DOMParser !== "undefined" &&
 						for (; i < len; i++) {
 							attribute = attributes[i];
 							node.setAttributeNS(
-								attribute.name().uri || null,
+								attribute.namespace().uri || null,
 								attribute.localName(),
 								attribute.toString()
 							);
@@ -82,7 +84,7 @@ typeof XML !== "undefined" && typeof DOMParser !== "undefined" &&
 			
 				case "attribute":
 					(node = xmlDoc.createAttributeNS(
-						xml.name().uri || null,
+						xml.namespace().uri || null,
 						xml.localName()
 					)).nodeValue = xml.toString();
 					return node;
@@ -100,11 +102,8 @@ typeof XML !== "undefined" && typeof DOMParser !== "undefined" &&
 	}
 	
 	$.fn.init = function (selector, context) {
-		if (typeof selector === "xml") {
-			selector = domNodeList.call(selector);
-		}
-		
-		return new Init(selector, context);
+		return new Init(typeof selector === "xml" ? domNodeList.call(selector) : selector,
+		                typeof context  === "xml" ? domNodeList.call(context)  : context);
 	};
 	
 	XML.ignoreWhitespace = false;
@@ -127,10 +126,10 @@ typeof XMLSerializer !== "undefined" &&
 	};
 }(jQuery, new XMLSerializer));
 
-if (typeof XML !== "undefined") {
-	// Try to set the default XML namespace to the XHTML namespace.
-    // It's outside the functions so it affects the global scope.
-	try {
-		eval("default xml namespace='http://www.w3.org/1999/xhtml'");
-	} catch (e) {}
+// Try to set the default XML namespace to the XHTML namespace.
+// It's outside the functions so it affects the global scope.
+try {
+	eval("default xml namespace='http://www.w3.org/1999/xhtml'");
+} catch (e) {}
+
 }

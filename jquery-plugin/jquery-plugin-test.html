@@ -22,8 +22,8 @@ h2 {
 <h2 id="xml2dom" class="fail"><em>XML → DOM</em> doesn't work.</h2>
 <h2 id="dom2xml" class="fail"><em>DOM → XML</em> doesn't work.</h2>
 <script type="application/javascript;e4x=1">
-$("#xml2dom").before( $(<h2 class="pass"><em>XML → DOM</em> works!</h2>) ).remove();
-$("#dom2xml").before( $( $(<h2 class="pass"><em>DOM → XML</em> works!</h2>).xml() ) ).remove();
+$("#xml2dom").replaceWith( $(<h2 class="pass"><em>XML → DOM</em> works!</h2>) );
+$("#dom2xml").replaceWith( $( $(<h2 class="pass"><em>DOM → XML</em> works!</h2>).xml() ) );
 </script>
 </body>
 </html>
