@@ -4,26 +4,30 @@
  * 
  * e4x.js implements the optional E4X features described in ECMA-357 2nd Edition Annex A.
  *
- * 2010-01-14
+ * 2010-02-18
  * 
  * By Elijah Grey, http://eligrey.com
  * License: The X11/MIT license (see COPYING.md)
  */
 
-/*global document, XML, XMLList, Namespace, Node, NodeList, DOMParser,
-  XMLSerializer, XPathResult*/
+/*global document, XML, XMLList, DOMParser, XMLSerializer, XPathResult */
 
 /*jslint undef: true, nomen: true, eqeqeq: true, bitwise: true, regexp: true,
   newcap: true, immed: true, maxerr: 1000, maxlen: 90 */
 
-typeof XML !== "undefined" &&
-typeof DOMParser !== "undefined" &&
-typeof XMLSerializer !== "undefined" &&
+"use strict";
+
 (function (XML) { // XML parameter for minification
-	"use strict";
+	
+	var undef = "undefined";
+	
+	if (typeof XML === undef || typeof DOMParser === undef ||
+	    typeof XMLSerializer === undef)
+	{
+		return;
+	}
 	
 	var
-	proto          = XML.prototype,
 	doc            = document,
 	xmlMediaType   = "application/xml",
 	domParser      = new DOMParser,
@@ -34,7 +38,7 @@ typeof XMLSerializer !== "undefined" &&
 		//      slower than the native DOM's engine).
 		
 		var newDoc     = domParser.parseFromString(
-			"<" + elem.tagName + "/>", xmlMediaType
+			"<" + elem.localName + "/>", xmlMediaType
 		),
 		docEl          = newDoc.documentElement,
 		childNodes     = elem.childNodes,
@@ -63,8 +67,9 @@ typeof XMLSerializer !== "undefined" &&
 				var attributes = xml.attributes(),
 				    children   = xml.children(),
 				    i, len;
+				
 				node = xmlDoc.createElementNS(
-					xml.namespace().uri || null,
+					xml.namespace().uri,
 					xml.localName()
 				);
 				
@@ -76,7 +81,7 @@ typeof XMLSerializer !== "undefined" &&
 					for (; i < len; i++) {
 						attribute = attributes[i];
 						node.setAttributeNS(
-							attribute.namespace().uri || null,
+							attribute.namespace().uri,
 							attribute.localName(),
 							attribute.toString()
 						);
@@ -107,59 +112,63 @@ typeof XMLSerializer !== "undefined" &&
 			
 			case "attribute":
 				(node = xmlDoc.createAttributeNS(
-					xml.namespace().uri || null,
+					xml.namespace().uri,
 					xml.localName()
 				)).nodeValue = xml.toString();
 				return node;
 		}
+	},
+	extendXMLProto = function (methods) {
+		for (method in methods) {
+			if (methods.hasOwnProperty(method) && !XML.prototype.function::[method]) {
+				XML.prototype.function::[method] = methods[method];
+			}
+		}
 	};
 	
-	proto.function::domNode ||
-	(proto.function::domNode = function () {
-		if (this.length() !== 1) {
-			return;
-		}
-		
-		return doc.adoptNode(xmlToDomNode(this));
-	});
-	
-	proto.function::domNodeList ||
-	(proto.function::domNodeList = function () {
-		var fragment = doc.createDocumentFragment();
-		
-		for (var i = 0, len = this.length(); i < len; i++) {
-			fragment.appendChild(this[i].domNode());
-		}
-		
-		return doc.adoptNode(fragment).childNodes;
-	});
-	
-	proto.function::xpath ||
-	(proto.function::xpath = function (xpathExp) {
-		var res = new XMLList;
-		
-		if (this.length() !== 1) {
-			for (var i = 0, len = this.length(); i < len; i++) {
-				res += this[i].xpath(xpathExp);
+	extendXMLProto({
+		domNode: function () {
+			if (this.length() !== 1) {
+				return;
 			}
+		
+			return doc.adoptNode(xmlToDomNode(this));
+		},
+		domNodeList: function () {
+			var fragment = doc.createDocumentFragment();
+		
+			for (var i = 0, len = this.length(); i < len; i++) {
+				fragment.appendChild(this[i].domNode());
+			}
+		
+			return doc.adoptNode(fragment).childNodes;
+		},
+		xpath: function (xpathExp) {
+			var res = new XMLList;
+	
+			if (this.length() !== 1) {
+				for (var i = 0, len = this.length(); i < len; i++) {
+					res += this[i].xpath(xpathExp);
+				}
+				return res;
+			}
+	
+			var domDoc = createDocumentFrom(this.domNode()),
+			xpr = domDoc.evaluate(
+				xpathExp,
+				domDoc.documentElement,
+				domDoc.createNSResolver(domDoc.documentElement),
+				XPathResult.ORDERED_NODE_ITERATOR_TYPE,
+				null
+			);
+	
+			var node;
+	
+			while (node = xpr.iterateNext()) {
+				res += new XML(xmlSerializer.serializeToString(node));
+			}
+	
 			return res;
 		}
-		
-		var domDoc = createDocumentFrom(this.domNode()),
-		xpr = domDoc.evaluate(
-			xpathExp,
-			domDoc.documentElement,
-			domDoc.createNSResolver(domDoc.documentElement),
-			XPathResult.ORDERED_NODE_ITERATOR_TYPE,
-			null
-		);
-		
-		var node;
-		
-		while (node = xpr.iterateNext()) {
-			res += new XML(xmlSerializer.serializeToString(node));
-		}
-		
-		return res;
 	});
 }(XML));
