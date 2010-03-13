@@ -1,4 +1,4 @@
-This program is licensed under the MIT/X11 license.
+e4x.js and the jQuery E4X DOM Plugin are licensed under the MIT/X11 license.
 
 
 MIT/X11 license

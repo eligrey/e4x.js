@@ -1,20 +1,18 @@
 e4x.js
 ======
 
-*Version 0.2.2*
-
 **e4x.js** implements the optional E4X features described in ECMA-357 2nd Edition Annex A.
 
 
 jQuery E4X DOM Plugin
 =====================
 
-*Version 0.1.2*
+*Version 0.1.3*
 
-The jQuery E4X DOM Plugin (jquery.e4x-dom.js) adds support for XML objects as DOM nodes
-in jQuery. It also adds support for converting jQuery objects into XMLLists and sets
-the default XML namespace to `http://www.w3.org/1999/xhtml` so you don't have to
-yourself when dealing with (X)HTML. To reset/change the default namespace, just use the
-following in the scope you wish for the namespace to be changed in.
+The jQuery E4X DOM Plugin ([jquery.e4x-dom.js][1]) adds support for XML nodes as DOM
+nodes in jQuery. It also adds support for converting jQuery objects into XMLLists.
+If an XML element does not have a namespace, it is assigned the XHTML 1.x namespace.
+To change the default assigned namespace, change `jQuery.defaultXMLNamespace` accordingly.
 
-    default xml namespace = "";
+
+ [1]: http://github.com/eligrey/e4x.js/blob/master/jquery-plugin/jquery.e4x-dom.js

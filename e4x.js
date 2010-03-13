@@ -1,10 +1,10 @@
 /*
  * e4x.js
- * Version 0.2.2
  * 
- * e4x.js implements the optional E4X features described in ECMA-357 2nd Edition Annex A.
+ * A JavaScript library that implements the optional E4X features described in
+ * ECMA-357 2nd Edition Annex A if they are not already implemented.
  *
- * 2010-02-18
+ * 2010-03-13
  * 
  * By Elijah Grey, http://eligrey.com
  * License: The X11/MIT license (see COPYING.md)
@@ -27,11 +27,10 @@
 		return;
 	}
 	
-	var
-	doc            = document,
-	xmlMediaType   = "application/xml",
-	domParser      = new DOMParser,
-	xmlSerializer  = new XMLSerializer,
+	var doc       = document,
+	xmlMediaType  = "application/xml",
+	domParser     = new DOMParser,
+	xmlSerializer = new XMLSerializer,
 	createDocumentFrom = function (elem) {
 		// XXX: Figure out a way to create a document without DOMParser or implent an
 		//      XPath engine for E4X (which would have to be another whole library and be
@@ -50,7 +49,7 @@
 			docEl.setAttributeNode(newDoc.adoptNode(attributeNodes.item(0)));
 		}
 		
-		for (i = 0; i < children; i++) {
+		for (i++; i < children; i++) {
 			docEl.appendChild(newDoc.adoptNode(childNodes[i]));
 		}
 		
