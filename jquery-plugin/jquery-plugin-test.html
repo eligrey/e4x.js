@@ -4,9 +4,6 @@
 <meta charset="utf-8" />
 <title>jQuery E4X DOM Plugin Test</title>
 <style type="text/css">
-h2 {
-	color: black;
-}
 .fail {
 	background-color: red;
 }
@@ -14,16 +11,28 @@ h2 {
 	background-color: limegreen;
 }
 </style>
-<script type="application/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+<script type="application/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.2/jquery.min.js"></script>
 <script type="application/javascript;e4x=1" src="jquery.e4x-dom.min.js"></script>
 </head>
 <body>
 <h1>jQuery E4X DOM Plugin Test</h1>
-<h2 id="xml2dom" class="fail"><em>XML → DOM</em> doesn't work.</h2>
-<h2 id="dom2xml" class="fail"><em>DOM → XML</em> doesn't work.</h2>
+<div id="xml2dom">
+	<h2 class="fail"><em>XML → DOM</em> doesn't work.</h2>
+</div>
+<div id="dom2xml">
+	<h2 class="fail"><em>DOM → XML</em> doesn't work.</h2>
+</div>
 <script type="application/javascript;e4x=1">
-$("#xml2dom").replaceWith( $(<h2 class="pass"><em>XML → DOM</em> works!</h2>) );
-$("#dom2xml").replaceWith( $( $(<h2 class="pass"><em>DOM → XML</em> works!</h2>).xml() ) );
+$("#xml2dom").empty().append($(
+	<h2 class="pass">
+		<em>XML → DOM</em> works!
+	</h2>
+));
+$("#dom2xml").empty().append($($(
+	<h2 class="pass">
+		<em>DOM → XML</em> works!
+	</h2>
+).xml()));
 </script>
 </body>
 </html>

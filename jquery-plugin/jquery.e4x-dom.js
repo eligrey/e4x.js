@@ -1,34 +1,35 @@
 /*
  * jQuery E4X DOM Plugin
- * Version 0.1.2
- * 2010-02-18
+ * Version 0.1.4
+ * 2010-03-13
  * 
  * By Elijah Grey, http://eligrey.com
  * License: The X11/MIT license
  */
 
-/*jslint evil: true, undef: true, nomen: true, eqeqeq: true, bitwise: true,
+/*jslint evil: true, strict: true, undef: true, nomen: true, eqeqeq: true, bitwise: true,
   regexp: true, newcap: true, immed: true, maxerr: 1000, maxlen: 90 */
 
 /*global jQuery, XML, XMLList, DOMParser, XMLSerializer, document */
+
+"use strict";
 
 if (typeof XML !== "undefined") {
 
 // Modifications that convert XML to DOM NodeLists when passing them to jQuery
 if (typeof DOMParser !== "undefined") {
 
-(function ($) {
-	"use strict";
-	
-	var Init = jQuery.fn.init,
+(function ($, domParser) {
+	var Init = $.fn.init,
 	doc      = document,
 	xmlDoc   = (new DOMParser).parseFromString("<x/>", "application/xml"),
 	piName   = /^[\w\-]+\s*/,
+	defaultXMLNSProp = "defaultXMLNamespace",
 	domNodeList;
 	
 	try {
 		// In case the script type doesn't include ;e4x=1 and XML is defined and
-		// a non-E4X-supporting browser somehow gets this far
+		// a non-E4X-supporting browser somehow gets this far.
 		domNodeList = eval("XML.prototype.function::domNodeList");
 	} catch (e) {
 		return;
@@ -44,7 +45,7 @@ if (typeof DOMParser !== "undefined") {
 						children   = xml.children(),
 						i, len;
 					node = xmlDoc.createElementNS(
-						xml.namespace().uri,
+						xml.namespace().uri || $[defaultXMLNSProp],
 						xml.localName()
 					);
 				
@@ -104,6 +105,9 @@ if (typeof DOMParser !== "undefined") {
 		};
 	}
 	
+	// If XML elements don't have a namespace, they will be set to the XHTML 1.x namespace
+	$[defaultXMLNSProp] = "http://www.w3.org/1999/xhtml";
+	
 	$.fn.init = function (selector, context) {
 		return new Init(typeof selector === "xml" ? domNodeList.call(selector) : selector,
 		                typeof context  === "xml" ? domNodeList.call(context)  : context);
@@ -133,11 +137,5 @@ if (typeof XMLSerializer !== "undefined") {
 }(jQuery, new XMLSerializer));
 
 }
-
-// Try to set the default XML namespace to the XHTML namespace.
-// It's outside the functions so it affects the global scope.
-try {
-	eval("default xml namespace='http://www.w3.org/1999/xhtml'");
-} catch (e) {}
 
 }
