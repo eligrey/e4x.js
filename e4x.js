@@ -4,7 +4,7 @@
  * A JavaScript library that implements the optional E4X features described in
  * ECMA-357 2nd Edition Annex A if they are not already implemented.
  *
- * 2010-03-13
+ * 2010-04-02
  * 
  * By Elijah Grey, http://eligrey.com
  * License: The X11/MIT license (see COPYING.md)
@@ -17,16 +17,7 @@
 
 "use strict";
 
-(function (XML) { // XML parameter for minification
-	
-	var undef = "undefined";
-	
-	if (typeof XML === undef || typeof DOMParser === undef ||
-	    typeof XMLSerializer === undef)
-	{
-		return;
-	}
-	
+(function (XML) {
 	var doc       = document,
 	xmlMediaType  = "application/xml",
 	domParser     = new DOMParser,
@@ -73,11 +64,10 @@
 				);
 				
 				if (attributes.length() !== 0) {
-					i = 0;
 					len = attributes.length();
 					var attribute;
 					
-					for (; i < len; i++) {
+					for (i = 0; i < len; i++) {
 						attribute = attributes[i];
 						node.setAttributeNS(
 							attribute.namespace().uri,
@@ -87,10 +77,9 @@
 					}
 				}
 				if (children.length() !== 0) {
-					i = 0;
 					len = children.length();
 					
-					for (; i < len; i++) {
+					for (i = 0; i < len; i++) {
 						node.appendChild(xmlToDomNode(children[i]));
 					}
 				}
@@ -118,7 +107,7 @@
 		}
 	},
 	extendXMLProto = function (methods) {
-		for (method in methods) {
+		for (var method in methods) {
 			if (methods.hasOwnProperty(method) && !XML.prototype.function::[method]) {
 				XML.prototype.function::[method] = methods[method];
 			}

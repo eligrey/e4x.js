@@ -1,3 +1,10 @@
+2010-04-02
+==========
+
+ * Fixed `methods` variable global leak.
+ * Removed checks for `DOMParser` and `XMLSerializer`.
+
+
 2010-03-13
 ==========
 
