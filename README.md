@@ -15,4 +15,8 @@ If an XML element does not have a namespace, it is assigned the XHTML 1.x namesp
 To change the default assigned namespace, change `jQuery.defaultXMLNamespace` accordingly.
 
 
+
+![Tracking image](//in.getclicky.com/212712ns.gif =1x1)
+
+
  [1]: http://github.com/eligrey/e4x.js/blob/master/jquery-plugin/jquery.e4x-dom.js
