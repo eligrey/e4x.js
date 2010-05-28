@@ -1,9 +1,9 @@
 /*
  * jQuery E4X DOM Plugin
  * Version 0.1.4
- * 2010-03-13
+ * 2010-05-27
  * 
- * By Elijah Grey, http://eligrey.com
+ * By Eli Grey, http://eligrey.com
  * License: The X11/MIT license
  */
 
@@ -43,18 +43,17 @@ if (typeof DOMParser !== "undefined") {
 				case "element":
 					var attributes = xml.attributes(),
 						children   = xml.children(),
-						i, len;
+						childLen   = children.length(),
+						attLen     = attributes.length(),
+						i, attribute;
+				
 					node = xmlDoc.createElementNS(
 						xml.namespace().uri || $[defaultXMLNSProp],
 						xml.localName()
 					);
 				
-					if (attributes.length() !== 0) {
-						i = 0;
-						len = attributes.length();
-						var attribute;
-					
-						for (; i < len; i++) {
+					if (attLen !== 0) {
+						for (i = 0; i < attLen; i++) {
 							attribute = attributes[i];
 							node.setAttributeNS(
 								attribute.namespace().uri,
@@ -63,11 +62,8 @@ if (typeof DOMParser !== "undefined") {
 							);
 						}
 					}
-					if (children.length() !== 0) {
-						i = 0;
-						len = children.length();
-					
-						for (; i < len; i++) {
+					if (childLen !== 0) {
+						for (i = 0; i < childLen; i++) {
 							node.appendChild(domNode(children[i]));
 						}
 					}

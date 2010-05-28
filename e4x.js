@@ -4,9 +4,9 @@
  * A JavaScript library that implements the optional E4X features described in
  * ECMA-357 2nd Edition Annex A if they are not already implemented.
  *
- * 2010-04-02
+ * 2010-05-27
  * 
- * By Elijah Grey, http://eligrey.com
+ * By Eli Grey, http://eligrey.com
  * License: The X11/MIT license (see COPYING.md)
  */
 
@@ -56,18 +56,17 @@
 			case "element":
 				var attributes = xml.attributes(),
 				    children   = xml.children(),
-				    i, len;
+				    childLen   = children.length(),
+				    attLen     = attributes.length(),
+				    i, attribute;
 				
 				node = xmlDoc.createElementNS(
 					xml.namespace().uri,
 					xml.localName()
 				);
 				
-				if (attributes.length() !== 0) {
-					len = attributes.length();
-					var attribute;
-					
-					for (i = 0; i < len; i++) {
+				if (attLen !== 0) {
+					for (i = 0; i < attLen; i++) {
 						attribute = attributes[i];
 						node.setAttributeNS(
 							attribute.namespace().uri,
@@ -76,10 +75,8 @@
 						);
 					}
 				}
-				if (children.length() !== 0) {
-					len = children.length();
-					
-					for (i = 0; i < len; i++) {
+				if (childLen !== 0) {
+					for (i = 0; i < childLen; i++) {
 						node.appendChild(xmlToDomNode(children[i]));
 					}
 				}
@@ -116,11 +113,9 @@
 	
 	extendXMLProto({
 		domNode: function () {
-			if (this.length() !== 1) {
-				return;
+			if (this.length() === 1) {
+				return doc.adoptNode(xmlToDomNode(this));
 			}
-		
-			return doc.adoptNode(xmlToDomNode(this));
 		},
 		domNodeList: function () {
 			var fragment = doc.createDocumentFragment();
@@ -132,10 +127,11 @@
 			return doc.adoptNode(fragment).childNodes;
 		},
 		xpath: function (xpathExp) {
-			var res = new XMLList;
+			var res = new XMLList,
+			    len = this.length();
 	
-			if (this.length() !== 1) {
-				for (var i = 0, len = this.length(); i < len; i++) {
+			if (len !== 1) {
+				for (var i = 0, len = len; i < len; i++) {
 					res += this[i].xpath(xpathExp);
 				}
 				return res;
@@ -148,9 +144,8 @@
 				domDoc.createNSResolver(domDoc.documentElement),
 				XPathResult.ORDERED_NODE_ITERATOR_TYPE,
 				null
-			);
-	
-			var node;
+			),
+			node;
 	
 			while (node = xpr.iterateNext()) {
 				res += new XML(xmlSerializer.serializeToString(node));

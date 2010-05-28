@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta charset="utf-8" />
 <title>jQuery E4X DOM Plugin Test</title>
@@ -23,6 +23,7 @@
 	<h2 class="fail"><em>DOM → XML</em> doesn't work.</h2>
 </div>
 <script type="application/javascript;e4x=1">
+//<![CDATA[
 $("#xml2dom").empty().append($(
 	<h2 class="pass">
 		<em>XML → DOM</em> works!
@@ -33,6 +34,7 @@ $("#dom2xml").empty().append($($(
 		<em>DOM → XML</em> works!
 	</h2>
 ).xml()));
+//]]>
 </script>
 </body>
 </html>
