@@ -1,3 +1,11 @@
+2010-06-30
+==========
+
+* Now using `document.implementation.createDocument` instead of `DOMParser` to create
+  DOM documents.
+* Tidied up the XML prototype method extension code.
+
+
 2010-05-27
 ==========
 

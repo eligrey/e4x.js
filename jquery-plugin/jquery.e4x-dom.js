@@ -1,7 +1,11 @@
 /*
  * jQuery E4X DOM Plugin
- * Version 0.1.4
- * 2010-05-27
+ * Version 0.1.5
+ * 2010-06-30
+ * 
+ * The jQuery E4X DOM plugin adds support of interchanging E4X XML and DOM nodes
+ * with jQuery through a modified initialization method that converts XML to DOM nodes
+ * and a jQuery.fn.xml method that converts DOM nodes to XML. 
  * 
  * By Eli Grey, http://eligrey.com
  * License: The X11/MIT license
@@ -10,30 +14,20 @@
 /*jslint evil: true, strict: true, undef: true, nomen: true, eqeqeq: true, bitwise: true,
   regexp: true, newcap: true, immed: true, maxerr: 1000, maxlen: 90 */
 
-/*global jQuery, XML, XMLList, DOMParser, XMLSerializer, document */
+/*global jQuery, XML, XMLList, XMLSerializer, document */
 
 "use strict";
 
 if (typeof XML !== "undefined") {
 
-// Modifications that convert XML to DOM NodeLists when passing them to jQuery
-if (typeof DOMParser !== "undefined") {
-
-(function ($, domParser) {
+(function (XML, $, xmlSerializer) {
 	var Init = $.fn.init,
-	doc      = document,
-	xmlDoc   = (new DOMParser).parseFromString("<x/>", "application/xml"),
+	hostDoc  = document,
+	NULL     = null,
+	xmlDoc   = hostDoc.implementation.createDocument(NULL, NULL, NULL),
 	piName   = /^[\w\-]+\s*/,
 	defaultXMLNSProp = "defaultXMLNamespace",
-	domNodeList;
-	
-	try {
-		// In case the script type doesn't include ;e4x=1 and XML is defined and
-		// a non-E4X-supporting browser somehow gets this far.
-		domNodeList = eval("XML.prototype.function::domNodeList");
-	} catch (e) {
-		return;
-	}
+	domNodeList = XML.prototype.function::domNodeList;
 	
 	if (!domNodeList) {
 		var domNode = function (xml) {
@@ -91,13 +85,13 @@ if (typeof DOMParser !== "undefined") {
 			}
 		};
 		domNodeList = function () {
-			var fragment = doc.createDocumentFragment();
+			var fragment = hostDoc.createDocumentFragment();
 		
 			for (var i = 0, len = this.length(); i < len; i++) {
-				fragment.appendChild(doc.adoptNode(domNode(this[i])));
+				fragment.appendChild(hostDoc.adoptNode(domNode(this[i])));
 			}
 		
-			return doc.adoptNode(fragment).childNodes;
+			return hostDoc.adoptNode(fragment).childNodes;
 		};
 	}
 	
@@ -109,29 +103,20 @@ if (typeof DOMParser !== "undefined") {
 		                typeof context  === "xml" ? domNodeList.call(context)  : context);
 	};
 	
-	XML.ignoreWhitespace = false;
-}(jQuery));
-
-}
-
-
-// jQuery.fn.xml - Enables converting jQuery objects into XMLLists.
-if (typeof XMLSerializer !== "undefined") {
-
-(function ($, xmlSerializer) {
 	$.fn.xml = function () {
 		var xml = new XMLList,
 		    i   = 0,
 		    len = this.length;
 		
 		for (; i < len; i++) {
+			// Unfortunately, there's no efficient native XML.fromDomNode(node) method
 			xml += new XML(xmlSerializer.serializeToString(this[i]));
 		}
 		
 		return xml;
 	};
-}(jQuery, new XMLSerializer));
-
-}
+	
+	XML.ignoreWhitespace = false;
+}(XML, jQuery, new XMLSerializer));
 
 }

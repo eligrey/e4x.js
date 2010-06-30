@@ -1,3 +1,12 @@
+0.1.5
+=====
+
+* Now using `document.implementation.createDocument` instead of `DOMParser` to create the
+  XML host document.
+* Removed error-catching check for E4X syntax support.
+* Moved both jQuery method extensions into one closure.
+
+
 0.1.4
 =====
 

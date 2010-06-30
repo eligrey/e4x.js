@@ -4,13 +4,13 @@
  * A JavaScript library that implements the optional E4X features described in
  * ECMA-357 2nd Edition Annex A if they are not already implemented.
  *
- * 2010-05-27
+ * 2010-06-30
  * 
  * By Eli Grey, http://eligrey.com
  * License: The X11/MIT license (see COPYING.md)
  */
 
-/*global document, XML, XMLList, DOMParser, XMLSerializer, XPathResult */
+/*global document, XML, XMLList, XMLSerializer, XPathResult */
 
 /*jslint undef: true, nomen: true, eqeqeq: true, bitwise: true, regexp: true,
   newcap: true, immed: true, maxerr: 1000, maxlen: 90 */
@@ -18,36 +18,18 @@
 "use strict";
 
 (function (XML) {
-	var doc       = document,
-	xmlMediaType  = "application/xml",
-	domParser     = new DOMParser,
+	var hostDoc   = document,
 	xmlSerializer = new XMLSerializer,
-	createDocumentFrom = function (elem) {
-		// XXX: Figure out a way to create a document without DOMParser or implent an
-		//      XPath engine for E4X (which would have to be another whole library and be
-		//      slower than the native DOM's engine).
-		
-		var newDoc     = domParser.parseFromString(
-			"<" + elem.localName + "/>", xmlMediaType
-		),
-		docEl          = newDoc.documentElement,
-		childNodes     = elem.childNodes,
-		children       = childNodes.length,
-		attributeNodes = elem.attributes,
-		i              = attributeNodes.length;
-		
-		while (i--) {
-			docEl.setAttributeNode(newDoc.adoptNode(attributeNodes.item(0)));
+	piName        = /^[\w\-]+\s*/,
+	NULL          = null,
+	createDoc     = function (docElem) {
+		var domDoc = hostDoc.implementation.createDocument(NULL, NULL, NULL);
+		if (docElem) {
+			domDoc.appendChild(docElem);
 		}
-		
-		for (i++; i < children; i++) {
-			docEl.appendChild(newDoc.adoptNode(childNodes[i]));
-		}
-		
-		return newDoc;
+		return domDoc;
 	},
-	xmlDoc         = domParser.parseFromString("<x/>", xmlMediaType),
-	piName         = /^[\w\-]+\s*/,
+	xmlDoc        = createDoc(),
 	
 	xmlToDomNode = function (xml) {
 		var node;
@@ -103,28 +85,20 @@
 				return node;
 		}
 	},
-	extendXMLProto = function (methods) {
-		for (var method in methods) {
-			if (methods.hasOwnProperty(method) && !XML.prototype.function::[method]) {
-				XML.prototype.function::[method] = methods[method];
-			}
-		}
-	};
-	
-	extendXMLProto({
+	xmlMethods = {
 		domNode: function () {
 			if (this.length() === 1) {
-				return doc.adoptNode(xmlToDomNode(this));
+				return hostDoc.adoptNode(xmlToDomNode(this));
 			}
 		},
 		domNodeList: function () {
-			var fragment = doc.createDocumentFragment();
+			var fragment = hostDoc.createDocumentFragment();
 		
 			for (var i = 0, len = this.length(); i < len; i++) {
 				fragment.appendChild(this[i].domNode());
 			}
 		
-			return doc.adoptNode(fragment).childNodes;
+			return hostDoc.adoptNode(fragment).childNodes;
 		},
 		xpath: function (xpathExp) {
 			var res = new XMLList,
@@ -137,21 +111,29 @@
 				return res;
 			}
 	
-			var domDoc = createDocumentFrom(this.domNode()),
+			var domDoc = createDoc(this.domNode()),
 			xpr = domDoc.evaluate(
 				xpathExp,
 				domDoc.documentElement,
 				domDoc.createNSResolver(domDoc.documentElement),
 				XPathResult.ORDERED_NODE_ITERATOR_TYPE,
-				null
+				NULL
 			),
 			node;
 	
 			while (node = xpr.iterateNext()) {
+				// Unfortunately, there's no efficient native XML.fromDomNode(node) method
 				res += new XML(xmlSerializer.serializeToString(node));
 			}
 	
 			return res;
 		}
-	});
+	},
+	method;
+	
+	for (method in xmlMethods) {
+		if (xmlMethods.hasOwnProperty(method) && !XML.prototype.function::[method]) {
+			XML.prototype.function::[method] = xmlMethods[method];
+		}
+	}
 }(XML));
