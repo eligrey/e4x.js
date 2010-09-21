@@ -16,6 +16,8 @@
 
 /*global jQuery, XML, XMLList, XMLSerializer, document */
 
+/*! @source http://purl.eligrey.com/github/e4x.js/blob/master/jquery-plugin/jquery.e4x-dom.js*/
+
 "use strict";
 
 if (typeof XML !== "undefined") {

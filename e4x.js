@@ -15,6 +15,8 @@
 /*jslint undef: true, nomen: true, eqeqeq: true, bitwise: true, regexp: true,
   newcap: true, immed: true, maxerr: 1000, maxlen: 90 */
 
+/*! @source http://purl.eligrey.com/github/e4x.js/blob/master/e4x.js*/
+
 "use strict";
 
 (function (XML) {
