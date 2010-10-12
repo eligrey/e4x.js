@@ -7,7 +7,7 @@
  * 2010-06-30
  * 
  * By Eli Grey, http://eligrey.com
- * License: The X11/MIT license (see COPYING.md)
+ * License: The X11/MIT license (see LICENSE.md)
  */
 
 /*global document, XML, XMLList, XMLSerializer, XPathResult */

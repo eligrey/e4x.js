@@ -1,10 +1,9 @@
-e4x.js and the jQuery E4X DOM Plugin are licensed under the MIT/X11 license.
-
+This software is licensed under the MIT/X11 license.
 
 MIT/X11 license
 ---------------
 
-Copyright (c) 2010 Elijah Grey
+Copyright &copy; 2010 [Elijah Grey][1], who also goes by [Eli Grey][1].
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
@@ -26,3 +25,6 @@ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
+
+
+  [1]: http://eligrey.com
