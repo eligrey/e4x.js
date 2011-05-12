@@ -14,7 +14,7 @@ To change the default assigned namespace, change `jQuery.defaultXMLNamespace` ac
 
 
 
-![Tracking image](//in.getclicky.com/212712ns.gif =1x1)
+![Tracking image](//in.getclicky.com/212712ns.gif)
 
 
  [1]: http://plugins.jquery.com/project/e4x-dom
